@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using TMPro;
 
 public class GameManager : MonoBehaviour {
     public static GameManager Instance;
@@ -24,6 +25,7 @@ public class GameManager : MonoBehaviour {
         { "RocketLauncher", 0 }
     };
 
+    public CameraControl cameraControl;
     public GameObject PlayerPrefab;
     public GameObject EnemyPrefab;
     public GameObject BulletPrefab;
@@ -32,17 +34,17 @@ public class GameManager : MonoBehaviour {
     public AudioClip ShootSound;
     public AudioClip DieSound;
     public AudioSource MusicSource;
-    public Text ScoreText;
-    public Text LivesText;
-    public Text AmmoText;
-    public Text HighScoreText;
+    public TextMeshProUGUI ScoreText;
+    public TextMeshProUGUI LivesText;
+    public TextMeshProUGUI WeaponText;
+    public TextMeshProUGUI AmmoText;
+    public TextMeshProUGUI HighScoreText;
     public Slider HealthBar;
     public Slider VolumeSlider;
     public GameObject PausePanel;
     public GameObject GameOverPanel;
     public GameObject VictoryPanel;
     public Light SceneLight;
-    public Camera MainCam;
     private float nextSpawn = 0;
     public Transform[] SpawnPoints; // assigned in Inspector
 
@@ -57,19 +59,6 @@ public class GameManager : MonoBehaviour {
     }
 
     private void Start() {
-        if(MainCam == null) {
-            MainCam = Camera.main;
-        }
-        if(MusicSource == null) {
-            MusicSource = FindFirstObjectByType<AudioSource>();
-        }
-        if(ScoreText == null) {
-            ScoreText = GameObject.Find("ScoreText")?.GetComponent<Text>();
-        }
-        if(HealthBar == null) {
-            HealthBar = GameObject.Find("HealthBar")?.GetComponent<Slider>();
-        }
-
         RefreshUI();
     }
 
@@ -113,10 +102,11 @@ public class GameManager : MonoBehaviour {
     }
 
     private void RefreshUI() {
-        ScoreText.text = "Score: " + Score;
-        LivesText.text = "Lives: " + Lives;
-        AmmoText.text = CurrentWeapon + ": " + AmmoDict[CurrentWeapon];
-        HighScoreText.text = "Best: " + HighScore;
+        ScoreText.text = Score.ToString();
+        LivesText.text = Lives.ToString();
+        WeaponText.text = CurrentWeapon;
+        AmmoText.text = AmmoDict[CurrentWeapon].ToString();
+        HighScoreText.text = HighScore.ToString();
     }
 
     public void Pause() {
@@ -151,7 +141,7 @@ public class GameManager : MonoBehaviour {
             MusicSource.PlayOneShot(ShootSound);
         }
         // spawn bullet
-        Instantiate(BulletPrefab, MainCam.transform.position + MainCam.transform.forward, MainCam.transform.rotation);
+        Instantiate(BulletPrefab, cameraControl.CurrentCamera.transform.position + cameraControl.CurrentCamera.transform.forward, cameraControl.CurrentCamera.transform.rotation);
     }
 
     public void DamagePlayer(int dmg) {
